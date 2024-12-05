@@ -1,0 +1,9 @@
+[submodule "libs/light-csv"]
+	path = libs/light-csv
+	url = https://github.com/RoaringInferno/light-csv.git
+[submodule "libs/cli-parser"]
+	path = libs/cli-parser
+	url = https://github.com/RoaringInferno/cli-parser.git
+[submodule "libs/light-log"]
+	path = libs/light-log
+	url = https://github.com/RoaringInferno/light-log.git

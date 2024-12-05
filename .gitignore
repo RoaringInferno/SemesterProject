@@ -1,0 +1,41 @@
+# Compiled object files
+*.o
+*.obj
+
+# Compiled dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled static libraries
+*.a
+*.lib
+
+# Executable files
+*.exe
+*.out
+*.app
+
+# Debug files
+*.dSYM/
+*.pdb
+*.ilk
+*.aps
+*.ncb
+*.sdf
+*.opendb
+*.vcxproj.user
+
+# IDE specific files
+.vscode/
+.idea/
+*.code-workspace
+
+# Other files
+*.log
+*.tmp
+*.cache
+
+# Build Directories
+build/
+bin/
