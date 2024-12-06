@@ -1,5 +1,6 @@
 #include "command_id.hpp"
 #include "account.hpp"
+#include "account_manager.hpp"
 
 #include "cli_parser"
 #include "light-log"
@@ -13,10 +14,14 @@ const std::string LOG_DIR = "logs/";
 
 void args_raw_parse(std::vector<std::string> &args, const std::string &raw_args);
 void get_command_id(CommandID& command);
+void log_parsed_cli_args(largs::cli_parser& parsed_cli_args);
+
+void login(Account &account_data, AccountManager &account_manager, const std::string &username, const std::string &password);
 
 int main() {
     llog::file log_file;
     Account account_data;
+    AccountManager account_manager;
 
     // Ensure data directory exists
     llog::file::push("Checkpoint: ## Data Directory ##\n");
@@ -27,6 +32,7 @@ int main() {
     size_t loop_count = 1;
     while (true)
     {
+        llog::file::flush();
         llog::file::push("=============== Loop #"+std::to_string(loop_count)+" Start ===============\n");
         std::cout << account_data.get_username() << " > ";
         // ===== Command Parse =====
@@ -49,31 +55,7 @@ int main() {
         args_raw_parse(args, raw_args);
         largs::cli_parser parsed_cli_args(args);
         llog::file::push("\tParsed Arguments:\n");
-        for (const auto& arg : parsed_cli_args.argument_list())
-        {
-            llog::file::push("\t\t\"" + std::string(arg.argument_value) + "\": ");
-            switch (arg.argument_type)
-            {
-            case largs::cli_parser::argument_t::type::hard_argument:
-                llog::file::push("Hard Argument\n");
-                break;
-            case largs::cli_parser::argument_t::type::soft_argument:
-                llog::file::push("Soft Argument\n");
-                break;
-            case largs::cli_parser::argument_t::type::short_option_string:
-                llog::file::push("Short Option String\n");
-                break;
-            case largs::cli_parser::argument_t::type::long_option:
-                llog::file::push("Long Option\n");
-                break;
-            case largs::cli_parser::argument_t::type::passed_long_option_value:
-                llog::file::push("Passed Long Option Value\n");
-                break;
-            default:
-                llog::file::push("Error Type\n");
-                break;
-            }
-        }
+        log_parsed_cli_args(parsed_cli_args);
 
         // ===== Command Execution =====
         llog::file::push("Checkpoint: ## Command Execution ##\n");
@@ -81,30 +63,31 @@ int main() {
         {
         case CommandID::LOGIN: // Login Attempt
         llog::file::push("\tCommandID::LOGIN in command switch case\n");
-            if (parsed_cli_args.argument_list().size() != 2)
-            {
+            if (parsed_cli_args.argument_list().size() != 2) {
                 std::cout << "Usage: login <username> <password>\n";
-                llog::file::push("\t[!] Invalid number of arguments for login command\n");
+                llog::file::push("\t\t[!] Invalid number of arguments\n");
                 break;
             }
-            if (account_data.validate(parsed_cli_args.argument_list()[0].argument_value, parsed_cli_args.argument_list()[1].argument_value))
-            {
-                std::cout << "Logged in\n";
-                llog::file::push("\tSuccessfully logged in\n");
-            } else
-            {
-                std::cout << "Invalid Login Information\n";
-                llog::file::push("\tFailed to log in\n");
-                break;
-            }
+            login(
+                account_data,
+                account_manager,
+                parsed_cli_args.argument_list()[0].argument_value.data(),
+                parsed_cli_args.argument_list()[1].argument_value.data()
+            );
             break;
         case CommandID::LOGOUT: // Logout
         llog::file::push("\tCommandID::LOGOUT in command switch case\n");
-            account_data.write();
-            account_data.wipe_cache();
-            std::cout << "Logged out\n";
-            llog::file::push("\tLogged out\n");
+        {
+            if (!account_data.get_logged_in()) {
+                std::cout << "Already logged out\n";
+                llog::file::push("\t\tAlready logged out\n");
+                break;
+            }
+            account_manager.logout(account_data);
+            std::cout << "Logout Successful\n";
+            llog::file::push("\t\tLogout Successful\n");
             break;
+        }
         default:
         llog::file::push("\t[!] default case in command switch case\n");
             break;
@@ -178,5 +161,54 @@ void get_command_id(CommandID &command)
         std::cout << "Unknown command: " << raw_command << std::endl;
         llog::file::push("\t[!] Ignoring unknown command\n");
         return;
+    }
+}
+
+void log_parsed_cli_args(largs::cli_parser &parsed_cli_args)
+{
+    for (const auto& arg : parsed_cli_args.argument_list())
+    {
+        llog::file::push("\t\t\"" + std::string(arg.argument_value) + "\": ");
+        switch (arg.argument_type)
+        {
+        case largs::cli_parser::argument_t::type::hard_argument:
+            llog::file::push("Hard Argument\n");
+            break;
+        case largs::cli_parser::argument_t::type::soft_argument:
+            llog::file::push("Soft Argument\n");
+            break;
+        case largs::cli_parser::argument_t::type::short_option_string:
+            llog::file::push("Short Option String\n");
+            break;
+        case largs::cli_parser::argument_t::type::long_option:
+            llog::file::push("Long Option\n");
+            break;
+        case largs::cli_parser::argument_t::type::passed_long_option_value:
+            llog::file::push("Passed Long Option Value\n");
+            break;
+        default:
+            llog::file::push("Error Type\n");
+            break;
+        }
+    }
+}
+
+void login(Account &account_data, AccountManager &account_manager, const std::string &username, const std::string &password)
+{
+    llog::file::push("\t\tUsername: " + username +"\n");
+    llog::file::push("\t\tPassword: " + password +"\n");
+    Account::ID accnt_id = account_manager.get_account_id(username);
+    if (accnt_id == 0) {
+        std::cout << "Account not found (Invalid Username)\n";
+        llog::file::push("\t\t[!] Account not found (Invalid Username)\n");
+        return;
+    }
+    bool login_success = account_manager.login(accnt_id, password, account_data);
+    if (login_success) {
+        std::cout << "Login Successful\n";
+        llog::file::push("\t\tLogin Successful\n");
+    } else {
+        std::cout << "Login Failed (Invalid Password)\n";
+        llog::file::push("\t\t[!] Login Failed (Invalid Password)\n");
     }
 }

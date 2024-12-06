@@ -10,7 +10,9 @@ public:
         ERR = -1,
         EXIT = 0,
         LOGIN,
-        LOGOUT
+        LOGOUT,
+        ACCOUNT_CREATE,
+        ACCOUNT_DELETE
     };
 private:
     ID id{ERR};
