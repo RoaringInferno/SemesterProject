@@ -24,7 +24,7 @@ int main() {
     AccountManager account_manager;
 
     // Ensure data directory exists
-    llog::file::push("Checkpoint: ## Data Directory ##\n");
+    llog::file::push("Checkpoint: ## Directory Definitions ##\n");
     llog::file::push("\tData Directory: " + DATA_DIR + "\n");
     llog::file::push("\tLog Directory: " + LOG_DIR + "\n");
     std::filesystem::create_directory(DATA_DIR);
@@ -88,6 +88,33 @@ int main() {
             llog::file::push("\t\tLogout Successful\n");
             break;
         }
+        case CommandID::ACCOUNT_CREATE: // Account Create
+        llog::file::push("\tCommandID::ACCOUNT_CREATE in command switch case\n");
+        {
+            Account::ID new_account_id = account_manager.create_account();
+            std::cout << "New Account ID: " << new_account_id << "\n";
+            llog::file::push("\t\tNew Account ID: " + std::to_string(new_account_id) + "\n");
+            account_data = Account();
+            account_data.set_account_id(new_account_id);
+        }
+        break;
+        case CommandID::ACCOUNT_DELETE: // Account Delete
+        /*
+        Delete the current account, if logged in
+         */
+        llog::file::push("\tCommandID::ACCOUNT_CREATE/ACCOUNT_DELETE in command switch case\n");
+        {
+            if (!account_data.get_logged_in()) {
+                std::cout << "Not logged in\n";
+                llog::file::push("\t\tNot logged in\n");
+                break;
+            }
+            account_manager.delete_account(account_data.get_account_id());
+            account_data = Account();
+            std::cout << "Account Deleted\n";
+            llog::file::push("\t\tAccount Deleted\n");
+        }
+        break;
         default:
         llog::file::push("\t[!] default case in command switch case\n");
             break;
