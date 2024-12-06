@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <filesystem>
 
 const std::string DATA_DIR = "data/";
 const std::string LOG_DIR = "logs/";
@@ -63,6 +64,7 @@ int main() {
         {
         case CommandID::LOGIN: // Login Attempt
         llog::file::push("\tCommandID::LOGIN in command switch case\n");
+        {
             if (parsed_cli_args.argument_list().size() != 2) {
                 std::cout << "Usage: login <username> <password>\n";
                 llog::file::push("\t\t[!] Invalid number of arguments\n");
@@ -74,7 +76,8 @@ int main() {
                 parsed_cli_args.argument_list()[0].argument_value.data(),
                 parsed_cli_args.argument_list()[1].argument_value.data()
             );
-            break;
+        }
+        break;
         case CommandID::LOGOUT: // Logout
         llog::file::push("\tCommandID::LOGOUT in command switch case\n");
         {
@@ -86,8 +89,8 @@ int main() {
             account_manager.logout(account_data);
             std::cout << "Logout Successful\n";
             llog::file::push("\t\tLogout Successful\n");
-            break;
         }
+        break;
         case CommandID::ACCOUNT_CREATE: // Account Create
         llog::file::push("\tCommandID::ACCOUNT_CREATE in command switch case\n");
         {
@@ -175,6 +178,7 @@ void args_raw_parse(std::vector<std::string> &args, const std::string &raw_args)
     }
     push_field();
 }
+
 void get_command_id(CommandID &command)
 {
     std::string raw_command;

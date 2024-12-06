@@ -3,6 +3,7 @@
 #include "filesystem.hpp"
 
 #include <iostream>
+#include <algorithm>
 
 /*
 File Structure:
