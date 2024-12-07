@@ -20,6 +20,15 @@ void execute_command(Context &context, CommandID command, largs::cli_parser &par
     CASE_BLOCK(ACCOUNT_SET_SCHOOL_EMAIL)
     CASE_BLOCK(ACCOUNT_SET_PHONE)
     CASE_BLOCK(ACCOUNT_SET_TYPE)
+    CASE_BLOCK(ACCOUNT_SUMMARY)
+    CASE_BLOCK(ACCOUNT_GET_COURSES)
+    CASE_BLOCK(COURSE_SUMMARY)
+    CASE_BLOCK(COURSE_ADD_STUDENT)
+    CASE_BLOCK(COURSE_REMOVE_STUDENT)
+    CASE_BLOCK(COURSE_ADD_TEACHER)
+    CASE_BLOCK(COURSE_REMOVE_TEACHER)
+    CASE_BLOCK(COURSE_SET_NAME)
+    CASE_BLOCK(COURSE_SET_DESCRIPTION)
     default:
         llog::file::push("\t[!] No handler for given command enum\n");
         break;

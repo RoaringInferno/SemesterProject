@@ -4,6 +4,9 @@
 #include <string>
 
 const std::string DATA_DIR = "data/";
+const std::string LOG_DIR = "logs/";
+
+void ensure_directory_exists(const std::string &directory);
 
 std::ifstream read_file(std::string_view filename);
 std::ofstream create_file(std::string_view filename);

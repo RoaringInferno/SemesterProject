@@ -1,6 +1,5 @@
 #include "command_id.hpp"
 #include "account.hpp"
-#include "account_manager.hpp"
 #include "commands.hpp"
 
 #include "cli_parser"
@@ -11,9 +10,6 @@
 #include <vector>
 #include <filesystem>
 
-const std::string DATA_DIR = "data/";
-const std::string LOG_DIR = "logs/";
-
 void args_raw_parse(std::vector<std::string> &args, const std::string &raw_args);
 void get_command_id(CommandID& command);
 void log_parsed_cli_args(largs::cli_parser& parsed_cli_args);
@@ -21,14 +17,15 @@ void log_parsed_cli_args(largs::cli_parser& parsed_cli_args);
 void login(Account &account_data, AccountManager &account_manager, const std::string &username, const std::string &password);
 
 int main() {
-    llog::file log_file;
-    Context runtime_context;
-
     // Ensure data directory exists
     llog::file::push("Checkpoint: ## Directory Definitions ##\n");
     llog::file::push("\tData Directory: " + DATA_DIR + "\n");
     llog::file::push("\tLog Directory: " + LOG_DIR + "\n");
-    std::filesystem::create_directory(DATA_DIR);
+    ensure_directory_exists(DATA_DIR);
+    ensure_directory_exists(LOG_DIR);
+
+    llog::file log_file;
+    Context runtime_context;
 
     size_t loop_count = 1;
     while (true)
