@@ -126,15 +126,15 @@ void AccountManager::logout(Account &account)
     size_t index;
     get_account_index(account.get_account_id(), index);
     lcsv::csv_row *row = &account_data[index];
-    row->push_back(std::to_string(account.get_account_id()));
-    row->push_back(account.get_username());
-    row->push_back(account.get_password());
-    row->push_back(account.get_personal_email());
-    row->push_back(account.get_school_email());
-    row->push_back(account.get_phone());
-    row->push_back(account.get_first_name());
-    row->push_back(account.get_last_name());
-    row->push_back(Account::encode_type(account.get_type()));
+    row->set(ACCOUNT_ID, std::to_string(account.get_account_id()));
+    row->set(USERNAME, account.get_username());
+    row->set(PASSWORD, account.get_password());
+    row->set(PERSONAL_EMAIL, account.get_personal_email());
+    row->set(SCHOOL_EMAIL, account.get_school_email());
+    row->set(PHONE, account.get_phone());
+    row->set(FIRST_NAME, account.get_first_name());
+    row->set(LAST_NAME, account.get_last_name());
+    row->set(TYPE, Account::encode_type(account.get_type()));
     account = Account();
 }
 
@@ -184,5 +184,6 @@ AccountManager::AccountManager() :
 
 AccountManager::~AccountManager()
 {
+    account_data.wipe_file();
     account_data.write();
 }
