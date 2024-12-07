@@ -39,20 +39,21 @@ const std::string ACCOUNT_CSV_FILE_HEADER = "account_id,username,password,person
 
 void AccountManager::populate(const size_t index, Account &account) const
 {
-    account.set_account_id(std::stoi(account_data[index][ACCOUNT_ID]));
-    account.set_username(account_data[index][USERNAME]);
-    account.set_password(account_data[index][PASSWORD]);
-    account.set_personal_email(account_data[index][PERSONAL_EMAIL]);
-    account.set_school_email(account_data[index][SCHOOL_EMAIL]);
-    account.set_phone(account_data[index][PHONE]);
-    account.set_first_name(account_data[index][FIRST_NAME]);
-    account.set_last_name(account_data[index][LAST_NAME]);
-    account.set_type(Account::decode_type(account_data[index][TYPE]));
+    Account::ID account_id = std::stoi(account_data[index][ACCOUNT_ID].get_value());
+    account.set_account_id(account_id);
+    account.set_username(account_data[index][USERNAME].get_value());
+    account.set_password(account_data[index][PASSWORD].get_value());
+    account.set_personal_email(account_data[index][PERSONAL_EMAIL].get_value());
+    account.set_school_email(account_data[index][SCHOOL_EMAIL].get_value());
+    account.set_phone(account_data[index][PHONE].get_value());
+    account.set_first_name(account_data[index][FIRST_NAME].get_value());
+    account.set_last_name(account_data[index][LAST_NAME].get_value());
+    account.set_type(Account::decode_type(account_data[index][TYPE].get_value()));
 }
 
 bool AccountManager::get_account_index(const Account::ID account_id, size_t &index) const
 {
-    auto get_id = [&](const size_t row_index) -> Account::ID { return std::stoi(account_data[row_index][ACCOUNT_ID]); };
+    auto get_id = [&](const size_t row_index) -> Account::ID { return std::stoi(account_data[row_index][ACCOUNT_ID].get_value()); };
     // Linear Search Algorithm:
     for (size_t i = 0; i < account_data.size(); i++)
     {
@@ -95,12 +96,11 @@ bool AccountManager::get_account(const Account::ID account_id, Account &account)
 
 Account::ID AccountManager::get_account_id(const std::string &username) const
 {
-    std::cout << "Entered AccountManager::get_account_id()\n"; // Debugging
     for (const auto &row : account_data)
     {
         if (row[USERNAME] == username)
         {
-            return std::stoi(row[ACCOUNT_ID]);
+            return std::stoi(row[ACCOUNT_ID].get_value());
         }
     }
     return 0;
@@ -108,14 +108,12 @@ Account::ID AccountManager::get_account_id(const std::string &username) const
 
 bool AccountManager::login(const Account::ID account_id, const std::string &password, Account &account) const
 {
-    std::cout << "Entered AccountManager::login()\n"; // Debugging
     size_t index;
     get_account_index(account_id, index);
-    std::cout << "\tFound account index: " << index << "\n"; // Debugging
     const lcsv::csv_row &row = account_data[index];
     if (row[PASSWORD] == password)
     {
-        populate(account_id, account);
+        populate(index, account);
         account.set_logged_in(true);
         return true;
     }
@@ -127,16 +125,16 @@ void AccountManager::logout(Account &account)
     if (!account.get_logged_in()) return; // Already logged out
     size_t index;
     get_account_index(account.get_account_id(), index);
-    lcsv::csv_row &row = account_data[index];
-    row.set(ACCOUNT_ID, std::to_string(account.get_account_id()));
-    row.set(USERNAME, account.get_username());
-    row.set(PASSWORD, account.get_password());
-    row.set(PERSONAL_EMAIL, account.get_personal_email());
-    row.set(SCHOOL_EMAIL, account.get_school_email());
-    row.set(PHONE, account.get_phone());
-    row.set(FIRST_NAME, account.get_first_name());
-    row.set(LAST_NAME, account.get_last_name());
-    row.set(TYPE, Account::encode_type(account.get_type()));
+    lcsv::csv_row *row = &account_data[index];
+    row->push_back(std::to_string(account.get_account_id()));
+    row->push_back(account.get_username());
+    row->push_back(account.get_password());
+    row->push_back(account.get_personal_email());
+    row->push_back(account.get_school_email());
+    row->push_back(account.get_phone());
+    row->push_back(account.get_first_name());
+    row->push_back(account.get_last_name());
+    row->push_back(Account::encode_type(account.get_type()));
     account = Account();
 }
 

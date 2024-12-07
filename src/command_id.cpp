@@ -1,5 +1,8 @@
 #include "command_id.hpp"
 
+#include <string>
+#include <iostream>
+
 CommandID::ID CommandID::GetId(std::string_view raw_command)
 {
     // if (raw_command == "exit") return ID::EXIT;
@@ -53,7 +56,7 @@ CommandID::ID CommandID::GetId(std::string_view raw_command)
         - summary
         - get
         ([0] & [1]) with opcount 1 and tightness 16 has hash table: 98 100 97 113 101
-        ([0] & [1])-97 : 1 3 0 2 4
+        ([0] & [1])-97 : 1 3 0 16 4
         */
         offset += 7 + 1;
         switch((raw_command[0+offset] & raw_command[1+offset])-97)
@@ -96,7 +99,7 @@ CommandID::ID CommandID::GetId(std::string_view raw_command)
             case 16: // type
                 return ID::ACCOUNT_SET_TYPE;
             }
-        case 2: // summary
+        case 16: // summary
             return ID::ACCOUNT_SUMMARY;
         case 4: // get
             return ID::ACCOUNT_GET_COURSES;
