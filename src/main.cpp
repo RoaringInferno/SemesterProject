@@ -60,8 +60,8 @@ int main() {
 
         loop_count++;
     }
-    std::cout << "===== Dumping Log Buffer: =====\n";
-    llog::file::dump();
+    // std::cout << "===== Dumping Log Buffer: =====\n";
+    // llog::file::dump();
     return 0;
 }
 
