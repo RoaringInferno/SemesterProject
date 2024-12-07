@@ -125,7 +125,9 @@ bool AccountManager::login(const Account::ID account_id, const std::string &pass
 void AccountManager::logout(Account &account)
 {
     if (!account.get_logged_in()) return; // Already logged out
-    lcsv::csv_row &row = account_data[account.get_account_id()];
+    size_t index;
+    get_account_index(account.get_account_id(), index);
+    lcsv::csv_row &row = account_data[index];
     row.set(ACCOUNT_ID, std::to_string(account.get_account_id()));
     row.set(USERNAME, account.get_username());
     row.set(PASSWORD, account.get_password());
@@ -135,7 +137,7 @@ void AccountManager::logout(Account &account)
     row.set(FIRST_NAME, account.get_first_name());
     row.set(LAST_NAME, account.get_last_name());
     row.set(TYPE, Account::encode_type(account.get_type()));
-    account.set_logged_in(false);
+    account = Account();
 }
 
 Account::ID AccountManager::create_account()

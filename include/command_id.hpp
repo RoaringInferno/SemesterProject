@@ -12,7 +12,15 @@ public:
         LOGIN,
         LOGOUT,
         ACCOUNT_CREATE,
-        ACCOUNT_DELETE
+        ACCOUNT_DELETE,
+        ACCOUNT_SET_USERNAME,
+        ACCOUNT_SET_PASSWORD,
+        ACCOUNT_SET_FIRST_NAME,
+        ACCOUNT_SET_LAST_NAME,
+        ACCOUNT_SET_PERSONAL_EMAIL,
+        ACCOUNT_SET_SCHOOL_EMAIL,
+        ACCOUNT_SET_PHONE,
+        ACCOUNT_SET_TYPE
     };
 private:
     ID id{ERR};
