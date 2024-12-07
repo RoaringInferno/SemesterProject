@@ -35,6 +35,8 @@ void execute_command(Context &context, CommandID command, largs::cli_parser &par
     }
 }
 
+#undef CASE_BLOCK
+
 bool require_logged_in(Context &context)
 {
     if (!context.account_data.get_logged_in())
