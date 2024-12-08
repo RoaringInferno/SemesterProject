@@ -21,7 +21,6 @@ void run_LOGIN(Context &context, largs::cli_parser &parsed_cli_args)
     }
     bool login_success = context.account_manager.login(accnt_id, password, context.account_data);
     if (login_success) {
-        std::cout << "Login Successful\n";
         llog::file::push("\t\tLogin Successful\n");
     } else {
         std::cout << "Login Failed (Invalid Password)\n";
